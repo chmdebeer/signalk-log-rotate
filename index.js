@@ -1,7 +1,7 @@
 const fs = require('fs');
 const cron = require('node-cron');
 
-const logFolder = '../temp';
+let logFolder = './';
 
 module.exports = function (app) {
 
@@ -15,15 +15,13 @@ module.exports = function (app) {
         if ( file.startsWith('skserver-raw_') ) {
           let logDate = file.substring(13, 23) ;
           if (logDate < todayDate) {
-            app.debug('Removing ' + file);
-            // fs.unlink(file, (err) => {
-            //   console.log(err);
-            //   //file removed
-            // });
+            app.debug('Removing ' + logFolder + '/' + file);
+            fs.unlink(logFolder + '/' + file, (err) => {
+              // console.log(err);
+              //file removed
+            });
           }
         }
-
-
       });
     });
   }
@@ -31,8 +29,7 @@ module.exports = function (app) {
   let _start = function(options) {
     app.debug(`${plugin.name} Started...`)
 
-    console.log(app.config);
-    console.log(app.env);
+    logFolder = app.config.configPath;
 
     cron.schedule('0 0 * * * *', () => {
       checkLogFiles();
